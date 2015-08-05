@@ -2,16 +2,18 @@ package com.example.aamirbhatt.appliedresearchkit;
 
 import android.content.Intent;
 import android.content.IntentSender;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
@@ -81,10 +83,14 @@ public class MainActivity extends ActionBarActivity {
     private void buildFitnessClient() {
         // Create the Google API Client
         mClient = new GoogleApiClient.Builder(this)
-                .addApi(Fitness.SENSORS_API)
                 .addApi(Fitness.RECORDING_API)
-                .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                .addApi(Fitness.SENSORS_API)
+                .addApi(Fitness.SESSIONS_API)
+                .addApi(Fitness.HISTORY_API)
+                .addScope(new Scope(Scopes.FITNESS_LOCATION_READ_WRITE))
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
+                .addScope(new Scope(Scopes.FITNESS_BODY_READ_WRITE))
+                .addScope(new Scope(Scopes.FITNESS_BODY_READ))
                 .addConnectionCallbacks(
                         new GoogleApiClient.ConnectionCallbacks() {
 
@@ -93,8 +99,10 @@ public class MainActivity extends ActionBarActivity {
                                 Log.i(TAG, "Connected!!!");
                                 // Now you can make calls to the Fitness APIs.
                                 // Put application specific code here.
-                                findFitnessDataSources();
-                                subscribe();
+
+//                                subscribe();
+//                                senselocation();
+                                new InsertAndVerifySessionTask().execute();
                             }
 
                             @Override
@@ -174,12 +182,27 @@ public class MainActivity extends ActionBarActivity {
         super.onSaveInstanceState(outState);
         outState.putBoolean(AUTH_PENDING, authInProgress);
     }
+    private class InsertAndVerifySessionTask extends AsyncTask<Void, Void, Void> {
+        protected Void doInBackground(Void... params) {
+            //First, create a new session and an insertion request.
+            findFitnessDataSources();
+            SensorRequest ab = new SensorRequest.Builder()
+                    .setDataType(DataType.TYPE_STEP_COUNT_DELTA)// sample every 10s
+                    .build();
+            long a = ab.getSamplingRate(TimeUnit.DAYS);
+            Log.i(TAG, "steps backgrounded" + String.valueOf(ab.getSamplingRate(TimeUnit.SECONDS)));
+            TextView val = (TextView)findViewById(R.id.stepview);
+            val.setText(Long.toString(a));
+
+            return null;
+        }
+    }
 
     private void findFitnessDataSources() {
         // [START find_data_sources]
         Fitness.SensorsApi.findDataSources(mClient, new DataSourcesRequest.Builder()
                 // At least one datatype must be specified.
-                .setDataTypes(DataType.TYPE_LOCATION_SAMPLE)
+                .setDataTypes(DataType.TYPE_LOCATION_SAMPLE,DataType.AGGREGATE_STEP_COUNT_DELTA,DataType.TYPE_LOCATION_TRACK)
                         // Can specify whether data type is raw or derived.
                 .setDataSourceTypes(DataSource.TYPE_RAW)
                 .build())
@@ -225,13 +248,18 @@ public class MainActivity extends ActionBarActivity {
                         .build(),
                 mListener)
                 .setResultCallback(new ResultCallback<Status>() {
+
+
                     @Override
                     public void onResult(Status status) {
+                        status.describeContents();
                         if (status.isSuccess()) {
                             Log.i(TAG, "Listener registered!");
+                            Log.i(TAG, "kjkjk"+String.valueOf(status.describeContents()));
                         } else {
                             Log.i(TAG, "Listener not registered.");
                         }
+
                     }
                 });
         // [END register_data_listener]
@@ -289,6 +317,7 @@ public class MainActivity extends ActionBarActivity {
         // Invoke the Recording API to unsubscribe from the data type and specify a callback that
         // will check the result.
         // [START unsubscribe_from_datatype]
+
         Fitness.RecordingApi.unsubscribe(mClient, DataType.TYPE_ACTIVITY_SAMPLE)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
@@ -303,5 +332,22 @@ public class MainActivity extends ActionBarActivity {
                 });
         // [END unsubscribe_from_datatype]
     }
+public void senselocation(){
+    SensorRequest ab = new SensorRequest.Builder()
+            .setDataType(DataType.TYPE_STEP_COUNT_DELTA)// sample every 10s
+            .build();
+    long a = ab.getSamplingRate(TimeUnit.DAYS);
+    Log.i(TAG, "steps vovered" + String.valueOf(ab.getSamplingRate(TimeUnit.SECONDS)));
+    TextView val = (TextView)findViewById(R.id.stepview);
+    val.setText(Long.toString(a));
+
+//    dataSourcesResult.getDataSources(DataType.TYPE_LOCATION_SAMPLE);
+
+
 
 }
+
+
+}
+
+
