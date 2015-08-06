@@ -102,6 +102,8 @@ public class MainActivity extends ActionBarActivity {
 
 //                                subscribe();
 //                                senselocation();
+//
+                                findFitnessDataSources();
                                 new InsertAndVerifySessionTask().execute();
                             }
 
@@ -186,23 +188,17 @@ public class MainActivity extends ActionBarActivity {
         protected Void doInBackground(Void... params) {
             //First, create a new session and an insertion request.
             findFitnessDataSources();
-            SensorRequest ab = new SensorRequest.Builder()
-                    .setDataType(DataType.TYPE_STEP_COUNT_DELTA)// sample every 10s
-                    .build();
-            long a = ab.getSamplingRate(TimeUnit.DAYS);
-            Log.i(TAG, "steps backgrounded" + String.valueOf(ab.getSamplingRate(TimeUnit.SECONDS)));
-            TextView val = (TextView)findViewById(R.id.stepview);
-            val.setText(Long.toString(a));
-
             return null;
         }
     }
 
     private void findFitnessDataSources() {
         // [START find_data_sources]
+
+        //adding above
         Fitness.SensorsApi.findDataSources(mClient, new DataSourcesRequest.Builder()
                 // At least one datatype must be specified.
-                .setDataTypes(DataType.TYPE_LOCATION_SAMPLE,DataType.AGGREGATE_STEP_COUNT_DELTA,DataType.TYPE_LOCATION_TRACK)
+                .setDataTypes(DataType.TYPE_STEP_COUNT_CUMULATIVE)
                         // Can specify whether data type is raw or derived.
                 .setDataSourceTypes(DataSource.TYPE_RAW)
                 .build())
@@ -215,11 +211,9 @@ public class MainActivity extends ActionBarActivity {
                             Log.i(TAG, "Data Source type: " + dataSource.getDataType().getName());
 
                             //Let's register a listener to receive Activity data!
-                            if (dataSource.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)
-                                    && mListener == null) {
-                                Log.i(TAG, "Data source for LOCATION_SAMPLE found!  Registering.");
-                                registerFitnessDataListener(dataSource,
-                                        DataType.TYPE_LOCATION_SAMPLE);
+                            if (dataSource.getDataType().equals(DataType.TYPE_STEP_COUNT_CUMULATIVE) && mListener == null) {
+                                Log.i(TAG, "Data source for TYPE_STEP_COUNT_CUMULATIVE found!  Registering.");
+                                registerFitnessDataListener(dataSource, DataType.TYPE_STEP_COUNT_CUMULATIVE);
                             }
                         }
                     }
@@ -235,6 +229,8 @@ public class MainActivity extends ActionBarActivity {
                     Value val = dataPoint.getValue(field);
                     Log.i(TAG, "Detected DataPoint field: " + field.getName());
                     Log.i(TAG, "Detected DataPoint value: " + val);
+                    TextView val1 = (TextView)findViewById(R.id.stepview);
+                    val1.setText(Integer.toString(val.asInt()));
                 }
             }
         };
@@ -244,7 +240,7 @@ public class MainActivity extends ActionBarActivity {
                 new SensorRequest.Builder()
                         .setDataSource(dataSource) // Optional but recommended for custom data sets.
                         .setDataType(dataType) // Can't be omitted.
-                        .setSamplingRate(10, TimeUnit.SECONDS)
+                        .setSamplingRate(1, TimeUnit.SECONDS)
                         .build(),
                 mListener)
                 .setResultCallback(new ResultCallback<Status>() {
