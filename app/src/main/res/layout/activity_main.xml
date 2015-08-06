@@ -3,9 +3,25 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
+    android:background="@color/wallet_highlighted_text_holo_light">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:id="@+id/stepview" />
+    <TextView android:text="@string/hello_world"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/stepview1"
+        android:layout_alignParentTop="true"
+        android:textColor="#fff74dff" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/stepview"
+        android:layout_below="@+id/stepview1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:hint="StepCount Will be shown Here" />
 
 </RelativeLayout>

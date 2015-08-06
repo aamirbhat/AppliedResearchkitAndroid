@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">AppliedResearchkit</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="hello_world">Steps Taken!!</string>
     <string name="action_settings">Settings</string>
+    <string name="step_count">Steps Count Will get displayed here</string>
 </resources>

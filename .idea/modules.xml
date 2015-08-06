@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AppliedResearchkit.iml" filepath="$PROJECT_DIR$/AppliedResearchkit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AppliedResearchkitAndroid.iml" filepath="$PROJECT_DIR$/AppliedResearchkitAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
